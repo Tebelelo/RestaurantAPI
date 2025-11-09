@@ -1,5 +1,5 @@
 import {
-  createOrder as createOrderInDb,
+  addOrder,
   getOrders,
   getOrderById,
   updateOrder,
@@ -16,7 +16,7 @@ export const createOrder = async (req, res) => {
       return res.status(400).json({ message: "Missing required fields: customer_id, staff_id" });
     }
 
-    const newOrder = await createOrderInDb(customer_id, staff_id, status, order_time);
+    const newOrder = await addOrder(customer_id, staff_id, status, order_time);
     res.status(201).json(newOrder);
   } catch (error) {
     console.error("Error adding order:", error);

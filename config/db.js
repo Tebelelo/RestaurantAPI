@@ -1,10 +1,47 @@
-import { Pool } from "pg";
-import dotenv from "dotenv";
+import dotenv from 'dotenv'
+import { createClient } from '@supabase/supabase-js'
 
-dotenv.config();
 
-const pool = new Pool({
-  connectionString: process.env.DATABASE_URL,
-});
+dotenv.config()
+const{SUPABASE_URL, SUPABASE_KEY} = process.env
 
-export default pool;
+
+// Create Supabase client
+export const supabase = createClient(SUPABASE_URL, SUPABASE_KEY)
+
+/**
+ * Test connection and show first row of each table
+ */
+export  const supabaseConnection = async () => {
+  const tables = [
+    'customers',
+    'inventory',
+    'order_items',
+    'orders',
+    'payments',
+    'staff'
+  ]
+
+  console.log('🔗 Testing Supabase connection...\n')
+
+  for (const table of tables) {
+    try {
+      const { data, error } = await supabase
+        .from(table)
+        .select('*')
+        .limit(1)
+
+      if (error) {
+        console.error(` Table "${table}" connection failed:`, error.message)
+      } else {
+        console.log(`Table "${table}" connected successfully.`)
+        console.log(`Sample row from "${table}":`, data[0] || 'No data yet.')
+      }
+      console.log('-----------------------------------')
+    } catch (err) {
+      console.error(`Error accessing table "${table}":`, err.message)
+    }
+  }
+}
+
+export default supabaseConnection;

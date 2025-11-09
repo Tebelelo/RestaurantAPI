@@ -1,16 +1,17 @@
 // models/inventoryModel.js
-import pool from "../config/db.js";
+import { supabase } from "../config/db.js";
 
 //Add new item
 export const addItem = async (item_name, quantity, category, price, unit) => {
   try {
-    const result = await pool.query(
-      `INSERT INTO inventory (item_name, quantity, category, price, unit)
-       VALUES ($1, $2, $3, $4, $5)
-       RETURNING *`,
-      [item_name, quantity, category, price, unit]
-    );
-    return result.rows[0];
+    const { data, error } = await supabase
+      .from('inventory')
+      .insert({ item_name, quantity, category, price, unit })
+      .select()
+      .single();
+
+    if (error) throw error;
+    return data;
   } catch (error) {
     console.error("Error adding item:", error);
     throw error;
@@ -20,8 +21,13 @@ export const addItem = async (item_name, quantity, category, price, unit) => {
 //Get all items
 export const getItems = async () => {
   try {
-    const result = await pool.query("SELECT * FROM inventory ORDER BY item_id ASC");
-    return result.rows;
+    const { data, error } = await supabase
+      .from('inventory')
+      .select('*')
+      .order('item_id', { ascending: true });
+
+    if (error) throw error;
+    return data;
   } catch (error) {
     console.error("Error fetching items:", error);
     throw error;
@@ -31,8 +37,14 @@ export const getItems = async () => {
 //Get item by ID
 export const getItemById = async (id) => {
   try {
-    const result = await pool.query("SELECT * FROM inventory WHERE item_id = $1", [id]);
-    return result.rows[0];
+    const { data, error } = await supabase
+      .from('inventory')
+      .select('*')
+      .eq('item_id', id)
+      .single();
+
+    if (error) throw error;
+    return data;
   } catch (error) {
     console.error("Error fetching item by ID:", error);
     throw error;
@@ -40,16 +52,17 @@ export const getItemById = async (id) => {
 };
 
 //Update item
-export const updateItem = async (id, item_name, quantity, category, price, unit) => {
+export const updateItem = async (id, { item_name, quantity, category, price, unit }) => {
   try {
-    const result = await pool.query(
-      `UPDATE inventory
-       SET item_name = $1, quantity = $2, category = $3, price = $4, unit = $5
-       WHERE item_id = $6
-       RETURNING *`,
-      [item_name, quantity, category, price, unit, id]
-    );
-    return result.rows[0];
+    const { data, error } = await supabase
+      .from('inventory')
+      .update({ item_name, quantity, category, price, unit })
+      .eq('item_id', id)
+      .select()
+      .single();
+
+    if (error) throw error;
+    return data;
   } catch (error) {
     console.error("Error updating item:", error);
     throw error;
@@ -59,8 +72,13 @@ export const updateItem = async (id, item_name, quantity, category, price, unit)
 //Delete item
 export const deleteItem = async (id) => {
   try {
-    const result = await pool.query("DELETE FROM inventory WHERE item_id = $1 RETURNING *", [id]);
-    return result.rows[0];
+    const { data, error } = await supabase
+      .from('inventory')
+      .delete()
+      .eq('item_id', id);
+
+    if (error) throw error;
+    return data;
   } catch (error) {
     console.error("Error deleting item:", error);
     throw error;
