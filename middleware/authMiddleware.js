@@ -7,21 +7,21 @@ export const protect = async (req, res, next) => {
 
   if (req.headers.authorization && req.headers.authorization.startsWith("Bearer")) {
     try {
-      // Get token from header
+      //Get token from header
       token = req.headers.authorization.split(" ")[1];
 
-      // Verify token
+      //Verify token
       const decoded = jwt.verify(token, process.env.JWT_SECRET);
 
-      // Attach user to the request
-      // Check if it's a staff member or a customer based on the token payload
+      //Attach user to the request
+      //Check if it's a staff member or a customer based on the token payload
       if (decoded.role) {
         req.user = await getStaffMemberById(decoded.id);
       } else {
         req.user = await getCustomerById(decoded.id);
       }
 
-      // Exclude password from the user object
+      //Exclude password from the user object
       if (req.user && req.user.password) {
         delete req.user.password;
       }

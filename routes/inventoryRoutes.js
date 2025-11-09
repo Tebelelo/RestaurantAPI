@@ -11,7 +11,7 @@ import { protect, authorize } from "../middleware/authMiddleware.js";
 const router = express.Router();
 
 router.route("/")
-  .get(fetchItems)
+  .get(fetchItems) //anyone can view the menu
   .post(protect, authorize("admin", "manager"), createItem);
 
 router.route("/:id")

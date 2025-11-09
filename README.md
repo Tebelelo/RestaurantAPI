@@ -15,7 +15,7 @@ While functional, the primary goal of this API is educational. It provides a com
 
 - [Installation](#installation)
 - [Usage](#usage)
-- [API Endpoints](#api-endpoints)
+- [Seeding the Database](#seeding-the-database)
 
 
 ## Installation
